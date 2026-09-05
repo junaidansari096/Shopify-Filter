@@ -4,14 +4,13 @@
 name = "Fresheek Filters"
 
 client_id = "f330f6b76ad75ecedcf2c25345253d4b"
-application_url = "https://shopify.dev/apps/default-app-home"
+application_url = "https://shopify-filter.onrender.com"
 embedded = true
 
 [access_scopes]
 # read_products: required to detect product types, vendors, and available filter data.
 # write_themes: required by the Theme App Extension to render on the storefront theme.
-# read_shop_domains: required to resolve the shop domain during auth/session.
-scopes = "read_products,write_themes,read_shop_domains"
+scopes = "read_products,write_themes"
 
 [webhooks]
 api_version = "2025-10"
@@ -20,22 +19,16 @@ api_version = "2025-10"
   topics = [ "app/uninstalled" ]
   uri = "/webhooks/app/uninstalled"
 
-  [[webhooks.subscriptions]]
-  topics = [ "customers/data_request" ]
-  uri = "/webhooks/customers/data_request"
-
-  [[webhooks.subscriptions]]
-  topics = [ "customers/redact" ]
-  uri = "/webhooks/customers/redact"
-
-  [[webhooks.subscriptions]]
-  topics = [ "shop/redact" ]
-  uri = "/webhooks/shop/redact"
+  [webhooks.privacy_compliance]
+  customer_data_request_url = "https://shopify-filter.onrender.com/webhooks/customers/data_request"
+  customer_deletion_url = "https://shopify-filter.onrender.com/webhooks/customers/redact"
+  shop_deletion_url = "https://shopify-filter.onrender.com/webhooks/shop/redact"
 
 [auth]
 redirect_urls = [
-  "https://shopify.dev/apps/default-app-home/auth",
-  "https://shopify.dev/apps/default-app-home/auth/callback",
+  "https://shopify-filter.onrender.com/auth/callback",
+  "https://shopify-filter.onrender.com/auth/shopify/callback",
+  "https://shopify-filter.onrender.com/api/auth/callback"
 ]
 
 [app_proxy]
@@ -44,4 +37,3 @@ subpath = "fresheek-filters"
 prefix = "apps"
 
 [build]
-include_config_on_deploy = true

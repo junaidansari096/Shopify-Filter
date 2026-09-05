@@ -15,7 +15,7 @@ const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY || "dummy_api_key",
   apiSecretKey: process.env.SHOPIFY_API_SECRET || "dummy_secret_key",
   apiVersion: ApiVersion.October25,
-  scopes: (process.env.SCOPES ?? "read_products,write_themes,read_shop_domains").split(","),
+  scopes: (process.env.SCOPES ?? "read_products,write_themes").split(","),
   appUrl:
     process.env.SHOPIFY_APP_URL ||
     process.env.RENDER_EXTERNAL_URL ||
