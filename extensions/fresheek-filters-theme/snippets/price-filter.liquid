@@ -1,0 +1,138 @@
+{% comment %}
+  price-filter.liquid
+  Renders min/max price inputs AND synchronized dual-handle range slider
+  driven by Shopify's native price_range filter.
+  Uses shop currency symbol and currency-agnostic numeric formatting.
+{% endcomment %}
+
+{%- assign min_key = filter.min_value.param_name -%}
+{%- assign max_key = filter.max_value.param_name -%}
+
+{%- comment -%}
+  Convert raw cents or currency subunits using money_without_currency
+{%- endcomment -%}
+{%- assign raw_max = filter.range_max | divided_by: 100.0 | ceil -%}
+{%- if cart.currency.iso_code == 'JPY' or cart.currency.iso_code == 'KRW' or cart.currency.iso_code == 'VND' -%}
+  {%- assign raw_max = filter.range_max | floor -%}
+{%- endif -%}
+{%- if raw_max == 0 or raw_max == nil -%}
+  {%- assign raw_max = filter.range_max | money_without_currency | replace: ',', '' | floor -%}
+{%- endif -%}
+{%- if raw_max == 0 or raw_max == nil -%}
+  {%- assign raw_max = 1000 -%}
+{%- endif -%}
+
+{%- if filter.min_value.value -%}
+  {%- assign current_min = filter.min_value.value | divided_by: 100.0 | floor -%}
+  {%- if cart.currency.iso_code == 'JPY' or cart.currency.iso_code == 'KRW' or cart.currency.iso_code == 'VND' -%}
+    {%- assign current_min = filter.min_value.value | floor -%}
+  {%- endif -%}
+{%- else -%}
+  {%- assign current_min = 0 -%}
+{%- endif -%}
+
+{%- if filter.max_value.value -%}
+  {%- assign current_max = filter.max_value.value | divided_by: 100.0 | ceil -%}
+  {%- if cart.currency.iso_code == 'JPY' or cart.currency.iso_code == 'KRW' or cart.currency.iso_code == 'VND' -%}
+    {%- assign current_max = filter.max_value.value | ceil -%}
+  {%- endif -%}
+{%- else -%}
+  {%- assign current_max = raw_max -%}
+{%- endif -%}
+
+{%- assign currency_symbol = cart.currency.symbol | default: '₹' -%}
+{%- assign scope = scope | default: 'desktop' -%}
+{%- assign min_id = 'ff-' | append: scope | append: '-price-min' -%}
+{%- assign max_id = 'ff-' | append: scope | append: '-price-max' -%}
+{%- assign slider_min_id = 'ff-' | append: scope | append: '-slider-min' -%}
+{%- assign slider_max_id = 'ff-' | append: scope | append: '-slider-max' -%}
+
+<div
+  class="ff-price"
+  data-ff-price
+  data-ff-min-param="{{ min_key | escape }}"
+  data-ff-max-param="{{ max_key | escape }}"
+  data-ff-range-min="0"
+  data-ff-range-max="{{ raw_max }}"
+  data-ff-currency="{{ currency_symbol | escape }}"
+>
+  <div class="ff-price-inputs">
+    <div class="ff-price-field">
+      <label class="ff-price-label" for="{{ min_id }}">
+        <span class="ff-currency">{{ currency_symbol }}</span>
+        <input
+          type="number"
+          id="{{ min_id }}"
+          class="ff-price-input"
+          name="{{ min_key | escape }}"
+          value="{% if filter.min_value.value %}{{ current_min }}{% endif %}"
+          min="0"
+          max="{{ raw_max }}"
+          placeholder="0"
+          inputmode="numeric"
+          data-ff-price-min
+          aria-label="{{ 'filters.price_minimum' | t: default: 'Minimum' }}"
+        >
+      </label>
+    </div>
+
+    <span class="ff-price-separator">to</span>
+
+    <div class="ff-price-field">
+      <label class="ff-price-label" for="{{ max_id }}">
+        <span class="ff-currency">{{ currency_symbol }}</span>
+        <input
+          type="number"
+          id="{{ max_id }}"
+          class="ff-price-input"
+          name="{{ max_key | escape }}"
+          value="{% if filter.max_value.value %}{{ current_max }}{% endif %}"
+          min="0"
+          max="{{ raw_max }}"
+          placeholder="{{ raw_max }}"
+          inputmode="numeric"
+          data-ff-price-max
+          aria-label="{{ 'filters.price_maximum' | t: default: 'Maximum' }}"
+        >
+      </label>
+    </div>
+  </div>
+
+  {% comment %} Visual Dual-Handle Range Slider {% endcomment %}
+  <div class="ff-price-slider" data-ff-price-slider>
+    <div class="ff-slider-track-wrap">
+      <div class="ff-slider-base-track"><span class="ff-slider-inner-bar"></span></div>
+      <div class="ff-slider-highlight" data-ff-slider-highlight><span class="ff-slider-inner-fill"></span></div>
+      <input
+        type="range"
+        id="{{ slider_min_id }}"
+        class="ff-slider-thumb ff-slider-thumb--min"
+        min="0"
+        max="{{ raw_max }}"
+        value="{{ current_min }}"
+        step="1"
+        data-ff-slider-min
+        aria-label="Minimum price range handle"
+      >
+      <input
+        type="range"
+        id="{{ slider_max_id }}"
+        class="ff-slider-thumb ff-slider-thumb--max"
+        min="0"
+        max="{{ raw_max }}"
+        value="{{ current_max }}"
+        step="1"
+        data-ff-slider-max
+        aria-label="Maximum price range handle"
+      >
+    </div>
+    <div class="ff-slider-labels">
+      <span class="ff-slider-label-min">{{ currency_symbol }}0</span>
+      <span class="ff-slider-label-max">{{ currency_symbol }}{{ raw_max }}</span>
+    </div>
+  </div>
+
+  <button type="button" class="ff-price-apply" data-ff-price-apply>
+    {{ 'filters.apply' | t: default: 'Apply' }}
+  </button>
+</div>

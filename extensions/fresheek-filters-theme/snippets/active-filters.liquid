@@ -1,0 +1,66 @@
+{% comment %}
+  snippets/active-filters.liquid
+  Renders active filter chips server-side from Shopify's native filter objects.
+  Displays above the filter groups on both desktop and mobile.
+  Uses Shopify's native url_to_remove for progressive enhancement.
+{% endcomment %}
+
+{%- assign active_count = 0 -%}
+{%- for f in filters -%}
+  {%- assign active_count = active_count | plus: f.active_values.size -%}
+  {%- if f.type == 'price_range' -%}
+    {%- if f.min_value.value or f.max_value.value -%}
+      {%- assign active_count = active_count | plus: 1 -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+
+<div
+  class="ff-active-filters{% if active_count == 0 %} ff-active-filters--empty{% endif %}"
+  data-ff-active-filters
+  {% if active_count == 0 %}style="display: none;"{% endif %}
+>
+  <div class="ff-active-filters-header">
+    <span class="ff-active-filters-title">Active filters</span>
+    <button type="button" class="ff-clear-all" data-ff-clear-all aria-label="{{ 'filters.clear_all' | t: default: 'Clear all' }}">
+      {{ 'filters.clear_all' | t: default: 'Clear all' }}
+    </button>
+  </div>
+
+  <ul class="ff-active-chips" data-ff-active-chips>
+    {%- for f in filters -%}
+      {%- for val in f.active_values -%}
+        <li class="ff-active-chip" data-ff-chip data-ff-param="{{ f.param_name | escape }}" data-ff-value="{{ val.value | escape }}">
+          <a
+            href="{{ val.url_to_remove }}"
+            class="ff-chip-remove"
+            data-ff-chip-remove
+            aria-label="Remove {{ f.label | escape }}: {{ val.label | escape }}"
+          >
+            <span class="ff-chip-label">{{ f.label | escape }}: {{ val.label | escape }}</span>
+            <span class="ff-chip-close" aria-hidden="true">✕</span>
+          </a>
+        </li>
+      {%- endfor -%}
+
+      {%- if f.type == 'price_range' -%}
+        {%- if f.min_value.value or f.max_value.value -%}
+          {%- assign currency_symbol = cart.currency.symbol | default: '₹' -%}
+          {%- assign min_display = f.min_value.value | default: 0 | money_without_trailing_zeros -%}
+          {%- assign max_display = f.max_value.value | default: f.range_max | money_without_trailing_zeros -%}
+          <li class="ff-active-chip" data-ff-chip data-ff-price-chip data-ff-min-param="{{ f.min_value.param_name | escape }}" data-ff-max-param="{{ f.max_value.param_name | escape }}">
+            <a
+              href="{{ f.url_to_remove }}"
+              class="ff-chip-remove"
+              data-ff-chip-remove
+              aria-label="Remove price filter"
+            >
+              <span class="ff-chip-label">Price: {{ min_display }} – {{ max_display }}</span>
+              <span class="ff-chip-close" aria-hidden="true">✕</span>
+            </a>
+          </li>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+</div>

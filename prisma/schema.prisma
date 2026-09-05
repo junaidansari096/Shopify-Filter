@@ -1,0 +1,134 @@
+// Fresheek Filters — Prisma schema
+// Uses SQLite in local development and PostgreSQL in production.
+// The schema below uses a provider that works for both via the
+// `provider` field which is swapped during deployment.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Session storage model required by PrismaSessionStorage.
+model Session {
+  id                   String    @id
+  shop                 String
+  state                String
+  isOnline             Boolean   @default(false)
+  scope                String?
+  expires              DateTime?
+  accessToken          String
+  userId               BigInt?
+  firstName            String?
+  lastName             String?
+  email                String?
+  accountOwner         Boolean   @default(false)
+  locale               String?
+  collaborator         Boolean?  @default(false)
+  emailVerified        Boolean?  @default(false)
+  refreshToken         String?
+  refreshTokenExpires  DateTime?
+
+  @@index([shop])
+  @@map("Session")
+}
+
+// A Shop row is created on first authenticated request from a store.
+model Shop {
+  id         String   @id @default(cuid())
+  shopDomain String   @unique
+  timezone   String?
+  currency   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  filters    FilterConfiguration[]
+  appearance AppearanceConfiguration?
+  shipping   AppSettings?
+
+  @@map("shops")
+}
+
+// One row per configured storefront filter. The sourceKey identifies the
+// underlying Shopify filter parameter (e.g. "filter.p.vendor") or a
+// metafield identity (e.g. "custom.skin_type"). The label is what the
+// shopper sees. position controls the display order.
+model FilterConfiguration {
+  id                  String   @id @default(cuid())
+  shopId              String
+  sourceKey           String
+  label               String
+  enabled             Boolean  @default(true)
+  position            Int      @default(0)
+  presentation        String   @default("checkbox-list")
+  searchable          Boolean  @default(false)
+  showCounts          Boolean  @default(true)
+  initialVisibleCount Int      @default(8)
+  showMore            Boolean  @default(true)
+  expandedDesktop     Boolean  @default(true)
+  expandedMobile      Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([shopId, sourceKey])
+  @@index([shopId, position])
+  @@map("filter_configurations")
+}
+
+// Per-shop appearance (CSS custom properties) configuration.
+model AppearanceConfiguration {
+  id                         String   @id @default(cuid())
+  shopId                     String   @unique
+  sidebarWidth               Int      @default(260) // px
+  sidebarWidthMin            Int      @default(220)
+  sidebarWidthMax            Int      @default(340)
+  headingSize                String   @default("16px")
+  optionFontSize             String   @default("14px")
+  showDivider                Boolean  @default(true)
+  dividerStrength            String   @default("1px")
+  checkboxRadius             String   @default("4px")
+  checkboxSize               String   @default("18px")
+  accentColor                String   @default("#032443")
+  textColor                  String   @default("#1F2937")
+  mutedTextColor             String   @default("#6B7280")
+  borderColor                String   @default("#E5E7EB")
+  selectedColor              String   @default("#032443")
+  panelBackground            String   @default("#FFFFFF")
+  panelRadius                String   @default("8px")
+  spacing                    String   @default("16px")
+  stickyDesktop              Boolean  @default(true)
+  stickyTopOffset            Int      @default(80) // px
+  mobileBreakpoint           Int      @default(990) // px
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@map("appearance_configurations")
+}
+
+// Per-shop general application settings.
+model AppSettings {
+  id                     String   @id @default(cuid())
+  shopId                 String   @unique
+  showProductCount       Boolean  @default(true)
+  showActiveFilters      Boolean  @default(true)
+  productGridSelector    String   @default("")
+  resultsSectionSelector String   @default("")
+  paginationMode         String   @default("infinite") // "infinite" | "pagination"
+  mobileDrawerPosition   String   @default("right")    // "right" | "left"
+  mobileTriggerText      String   @default("Filters")
+  mobileButtonVariant    String   @default("outline")  // "outline" | "solid"
+  mobileShowProductCount Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@map("app_settings")
+}

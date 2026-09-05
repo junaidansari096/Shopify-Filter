@@ -1,0 +1,14 @@
+# Get basic shop info for dashboard
+query GetShop {
+  shop {
+    id
+    name
+    myshopifyDomain
+    currencyCode
+    timezoneAbbreviation
+    primaryDomain {
+      url
+      host
+    }
+  }
+}

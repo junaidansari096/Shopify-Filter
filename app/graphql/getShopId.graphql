@@ -1,0 +1,6 @@
+# Verify the current shop and return its ID.
+query GetShopId {
+  shop {
+    id
+  }
+}

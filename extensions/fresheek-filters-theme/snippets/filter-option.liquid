@@ -1,0 +1,37 @@
+{% comment %}
+  filter-option.liquid
+  Renders a single filter value as a checkbox (default) or radio.
+
+  Parameters:
+    - filter:       the Shopify filter object
+    - value:        the filter value object (has value, label, count, active)
+    - presentation: 'checkbox-list' | 'radio-list' | 'boolean' (defaults to checkbox-list)
+{% endcomment %}
+
+{%- assign presentation = presentation | default: 'checkbox-list' -%}
+{%- assign scope = scope | default: 'desktop' -%}
+{%- assign opt_id = 'ff-' | append: scope | append: '-opt-' | append: filter.param_name | handle | append: '-' | append: value.value | handle -%}
+
+<label class="ff-option{% if value.active %} ff-option--active{% endif %} ff-option--{{ presentation }}" for="{{ opt_id }}">
+  <input
+    type="checkbox"
+    id="{{ opt_id }}"
+    class="ff-checkbox"
+    name="{{ filter.param_name | escape }}"
+    value="{{ value.value | escape }}"
+    {% if value.active %}checked{% endif %}
+    {% if value.count == 0 and value.active == false %}disabled{% endif %}
+    data-ff-option
+    data-ff-option-value="{{ value.value | escape }}"
+    data-ff-option-count="{{ value.count }}"
+  >
+  <span class="ff-checkbox-box" aria-hidden="true">
+    <svg class="ff-checkbox-icon" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M1.5 5L4.5 8L10.5 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
+  <span class="ff-option-label">{{ value.label | escape }}</span>
+  {%- if filter.type != 'boolean' -%}
+    <span class="ff-option-count" aria-hidden="true">({{ value.count }})</span>
+  {%- endif -%}
+</label>

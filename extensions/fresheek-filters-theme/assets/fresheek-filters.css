@@ -1,0 +1,961 @@
+/* ==========================================================================
+   Fresheek Filters — Storefront styles
+   All selectors are prefixed with .ff- to avoid clashing with theme styles.
+   Design tokens live as CSS custom properties on .fresheek-filters so the
+   merchant can adjust them from Admin (Appearance) or Theme Editor.
+   ========================================================================== */
+
+.fresheek-filters {
+  --ff-accent: #032443;
+  --ff-accent-2: #fe6b00;
+  --ff-text: #1f2937;
+  --ff-muted: #6b7280;
+  --ff-border: #e5e7eb;
+  --ff-panel-bg: #ffffff;
+  --ff-radius: 8px;
+  --ff-checkbox-radius: 4px;
+  --ff-checkbox-size: 18px;
+  --ff-sidebar-width: 260px;
+  --ff-sticky-offset: 80px;
+  --ff-mobile-breakpoint: 990px;
+  --ff-spacing: 16px;
+  --ff-heading-size: 16px;
+  --ff-option-font-size: 14px;
+  --ff-divider-color: var(--ff-border);
+
+  box-sizing: border-box;
+  font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--ff-text);
+}
+
+.fresheek-filters *,
+.fresheek-filters *::before,
+.fresheek-filters *::after {
+  box-sizing: border-box;
+}
+
+/* ========== Layout ========== */
+.ff-layout {
+  display: flex;
+  width: 100%;
+}
+
+.ff-sidebar {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0;
+}
+
+.ff-sidebar--sticky {
+  position: sticky;
+  top: var(--ff-sticky-offset);
+  align-self: flex-start;
+}
+
+/* Collection sidebar integration (Horizon / Dawn / OS 2.0 themes) */
+.facets-vertical .facets-wrapper {
+  width: var(--ff-sidebar-width, 260px) !important;
+  max-width: var(--ff-sidebar-width, 260px) !important;
+  flex: 0 0 var(--ff-sidebar-width, 260px) !important;
+  padding-right: 24px !important;
+  box-sizing: border-box !important;
+}
+
+.facets-vertical .product-grid-container {
+  flex: 1 1 0% !important;
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+/* ========== Header bar ========== */
+.ff-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ff-border);
+}
+
+.ff-header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.ff-filters-label {
+  font-size: var(--ff-heading-size);
+  font-weight: 600;
+  color: var(--ff-accent);
+}
+
+.ff-product-count {
+  font-size: var(--ff-option-font-size);
+  color: var(--ff-muted);
+}
+
+.ff-count-label {
+  font-size: var(--ff-option-font-size);
+}
+
+.ff-clear-all {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: var(--ff-option-font-size);
+  font-weight: 600;
+  color: var(--ff-accent-2);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.ff-clear-all:hover {
+  text-decoration: underline;
+}
+
+/* ========== Groups ========== */
+/*
+  Divider visibility is controlled by a custom property that is either "1" or "0".
+  We multiply the value by 1px to toggle the border without JS. The default is
+  overridden from Admin (Appearance) via an inline --ff-divider-visible value.
+*/
+.ff-group {
+  --ff-divider-visible: 1;
+  border-bottom: calc(var(--ff-divider-visible) * 1px) solid var(--ff-divider-color);
+}
+
+.ff-group:last-child {
+  border-bottom: none;
+}
+
+.ff-group-header {
+  margin: 0;
+}
+
+.ff-group-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.ff-group-label {
+  font-size: var(--ff-heading-size);
+  font-weight: 600;
+  color: var(--ff-text);
+}
+
+.ff-group-caret {
+  font-size: 14px;
+  color: var(--ff-muted);
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.ff-group-toggle[aria-expanded="false"] .ff-group-caret {
+  transform: rotate(-90deg);
+}
+
+.ff-group-toggle[aria-expanded="false"] + .ff-group-body {
+  display: none;
+}
+
+.ff-group-body {
+  padding: 0 0 14px;
+}
+
+/* ========== Option search ========== */
+.ff-search {
+  margin-bottom: 10px;
+}
+
+.ff-search-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--ff-border);
+  border-radius: var(--ff-radius);
+  font-size: var(--ff-option-font-size);
+  font-family: inherit;
+  color: var(--ff-text);
+  background: var(--ff-panel-bg);
+}
+
+.ff-search-input:focus {
+  outline: none;
+  border-color: var(--ff-accent);
+  box-shadow: 0 0 0 2px rgba(3, 36, 67, 0.12);
+}
+
+/* ========== Options ========== */
+.ff-option-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ff-option-row {
+  margin-bottom: 6px;
+}
+
+.ff-option-row--overflow {
+  display: none;
+}
+
+.ff-option-list--expanded .ff-option-row--overflow {
+  display: block;
+}
+
+.ff-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px;
+  cursor: pointer;
+  font-size: var(--ff-option-font-size);
+  border-radius: 4px;
+  position: relative;
+  user-select: none;
+}
+
+.ff-option:hover {
+  background: #f6f7f9;
+}
+
+/* Visually hide native checkbox while preserving native accessibility & click handling */
+.ff-checkbox {
+  position: absolute !important;
+  opacity: 0 !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+}
+
+/* Custom checkbox square box */
+.ff-checkbox-box {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: var(--ff-checkbox-size, 18px) !important;
+  min-width: var(--ff-checkbox-size, 18px) !important;
+  max-width: var(--ff-checkbox-size, 18px) !important;
+  height: var(--ff-checkbox-size, 18px) !important;
+  min-height: var(--ff-checkbox-size, 18px) !important;
+  max-height: var(--ff-checkbox-size, 18px) !important;
+  border: 1.5px solid var(--ff-muted, #6b7280) !important;
+  border-radius: var(--ff-checkbox-radius, 4px) !important;
+  background: #ffffff !important;
+  color: #ffffff !important;
+  flex: 0 0 var(--ff-checkbox-size, 18px) !important;
+  box-sizing: border-box !important;
+  transition: all 0.15s ease-in-out;
+}
+
+.ff-checkbox-icon {
+  width: 11px;
+  height: 11px;
+  display: block;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  stroke: #ffffff;
+}
+
+/* Checked state */
+.ff-checkbox:checked + .ff-checkbox-box,
+.ff-option--active .ff-checkbox-box {
+  background: var(--ff-selected, var(--ff-accent, #032443)) !important;
+  border-color: var(--ff-selected, var(--ff-accent, #032443)) !important;
+}
+
+.ff-checkbox:checked + .ff-checkbox-box .ff-checkbox-icon,
+.ff-option--active .ff-checkbox-box .ff-checkbox-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Focus visible state */
+.ff-checkbox:focus-visible + .ff-checkbox-box {
+  outline: 2px solid var(--ff-accent, #032443) !important;
+  outline-offset: 2px !important;
+}
+
+/* Disabled state */
+.ff-checkbox:disabled + .ff-checkbox-box {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  background: #f3f4f6 !important;
+}
+
+.ff-option-label {
+  flex: 1;
+  color: var(--ff-text);
+}
+
+.ff-option--active .ff-option-label {
+  font-weight: 600;
+}
+
+.ff-option-count {
+  color: var(--ff-muted);
+  font-size: 12px;
+}
+
+/* ========== Show more / less ========== */
+.ff-more-wrap {
+  margin-top: 8px;
+}
+
+.ff-show-more,
+.ff-show-less {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: var(--ff-option-font-size);
+  font-weight: 600;
+  color: var(--ff-accent-2);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.ff-no-match {
+  color: var(--ff-muted);
+  font-size: var(--ff-option-font-size);
+}
+
+/* ========== Price ========== */
+.ff-price {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ff-price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ff-price-field {
+  position: relative;
+  flex: 1;
+}
+
+.ff-price-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.ff-currency {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ff-muted);
+  font-size: var(--ff-option-font-size);
+  pointer-events: none;
+  font-weight: 500;
+}
+
+.ff-price-input {
+  width: 100%;
+  padding: 8px 8px 8px 22px;
+  border: 1px solid var(--ff-border);
+  border-radius: var(--ff-radius);
+  font-size: var(--ff-option-font-size);
+  font-family: inherit;
+  color: var(--ff-text);
+  background: var(--ff-panel-bg);
+  -moz-appearance: textfield;
+}
+
+.ff-price-input::-webkit-outer-spin-button,
+.ff-price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ff-price-input:focus {
+  outline: none;
+  border-color: var(--ff-accent);
+  box-shadow: 0 0 0 2px rgba(3, 36, 67, 0.12);
+}
+
+.ff-price-separator {
+  color: var(--ff-muted);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* Dual-handle slider */
+.ff-price-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ff-slider-track-wrap {
+  position: relative;
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.ff-slider-base-track {
+  display: block !important;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: #e5e7eb;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ff-slider-highlight {
+  display: block !important;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ff-accent, #032443);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ff-slider-inner-bar,
+.ff-slider-inner-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: inherit;
+}
+
+.ff-slider-thumb {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+  z-index: 3;
+}
+
+/* WebKit thumb */
+.ff-slider-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--ff-accent, #032443);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.ff-slider-thumb::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px rgba(3, 36, 67, 0.15);
+}
+
+.ff-slider-thumb:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--ff-accent, #032443);
+  outline-offset: 2px;
+}
+
+/* Firefox thumb */
+.ff-slider-thumb::-moz-range-thumb {
+  pointer-events: auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--ff-accent, #032443);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.ff-slider-thumb::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px rgba(3, 36, 67, 0.15);
+}
+
+.ff-slider-thumb:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--ff-accent, #032443);
+  outline-offset: 2px;
+}
+
+.ff-slider-thumb::-webkit-slider-runnable-track {
+  background: transparent;
+  border: none;
+}
+
+.ff-slider-thumb::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+
+.ff-slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ff-muted);
+}
+
+.ff-price-apply {
+  width: 100%;
+  padding: 8px 14px;
+  border: none;
+  background: var(--ff-accent, #032443);
+  color: #fff;
+  border-radius: var(--ff-radius);
+  font-size: var(--ff-option-font-size);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.ff-price-apply:hover {
+  opacity: 0.92;
+}
+
+/* ========== Mobile toolbar & trigger ========== */
+.ff-mobile-toolbar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 4px 0 16px 0;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--ff-border);
+}
+
+.ff-filter-trigger {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1.5px solid var(--ff-accent);
+  background: var(--ff-panel-bg);
+  color: var(--ff-accent);
+  border-radius: var(--ff-radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ff-filter-trigger:hover,
+.ff-filter-trigger:focus-visible {
+  background: var(--ff-accent);
+  color: #ffffff;
+}
+
+.ff-trigger-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.ff-trigger-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--ff-accent-2);
+  color: #ffffff;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ff-mobile-product-count {
+  font-size: var(--ff-option-font-size);
+  color: var(--ff-muted);
+  font-weight: 500;
+}
+
+.ff-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: none;
+}
+
+.ff-drawer:not([hidden]) {
+  display: flex;
+}
+
+.ff-drawer-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 36, 67, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.ff-drawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(88vw, 380px);
+  background: var(--ff-panel-bg);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 32px rgba(3, 36, 67, 0.16);
+  animation: ff-drawer-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ff-drawer-panel--left {
+  right: auto !important;
+  left: 0 !important;
+  box-shadow: 8px 0 32px rgba(3, 36, 67, 0.16) !important;
+  animation: ff-drawer-in-left 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes ff-drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes ff-drawer-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.ff-filter-trigger--solid {
+  background: var(--ff-accent) !important;
+  color: #ffffff !important;
+  border-color: var(--ff-accent) !important;
+}
+
+.ff-filter-trigger--solid .ff-trigger-badge {
+  background: #ffffff !important;
+  color: var(--ff-accent) !important;
+}
+
+.ff-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--ff-border);
+}
+
+.ff-drawer-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ff-accent);
+}
+
+.ff-drawer-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--ff-text);
+  line-height: 1;
+  transition: background 0.15s ease;
+}
+
+.ff-drawer-close:hover {
+  background: #e5e7eb;
+}
+
+.ff-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 20px;
+}
+
+.ff-drawer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--ff-border);
+  background: var(--ff-panel-bg);
+}
+
+.ff-drawer-view {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  background: var(--ff-accent);
+  color: #fff;
+  border-radius: var(--ff-radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+  transition: opacity 0.15s ease;
+}
+
+.ff-drawer-view:hover {
+  opacity: 0.92;
+}
+
+/* Drawer groups are collapsed by default on mobile until toggled */
+.ff-group-list--drawer .ff-group-body {
+  display: none;
+}
+
+.ff-group-list--drawer .ff-group-toggle[aria-expanded="true"] + .ff-group-body {
+  display: block;
+}
+
+/* ========== Active filter chips + empty state ========== */
+.ff-active-filters {
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--ff-border);
+}
+
+.ff-active-filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.ff-active-filters-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ff-muted);
+}
+
+.ff-active-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ff-active-chip {
+  display: inline-flex;
+}
+
+.ff-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ff-text);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.4;
+}
+
+.ff-chip-remove:hover {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+  color: var(--ff-accent);
+}
+
+.ff-chip-label {
+  display: inline-block;
+}
+
+.ff-chip-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ff-muted);
+  transition: color 0.15s ease;
+}
+
+.ff-chip-remove:hover .ff-chip-close {
+  color: var(--ff-accent);
+}
+
+.ff-empty-state {
+  text-align: center;
+  padding: 48px 16px;
+  border: 1px dashed var(--ff-border);
+  border-radius: var(--ff-radius);
+  color: var(--ff-muted);
+}
+
+.ff-empty-state button {
+  margin-top: 12px;
+}
+
+/* Loading state: dim grid slightly, keep products visible */
+.ff-block--loading {
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+
+.ff-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .ff-group-caret,
+  .ff-drawer-panel {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* ========== Responsive rules (Mobile vs Desktop) ========== */
+@media (max-width: 989px) {
+  .fresheek-filters .ff-header,
+  .fresheek-filters .ff-layout,
+  .fresheek-filters .ff-sidebar {
+    display: none !important;
+  }
+
+  .fresheek-filters .ff-mobile-toolbar {
+    display: flex !important;
+  }
+
+  .ff-filter-trigger {
+    display: inline-flex !important;
+  }
+}
+
+@media (min-width: 990px) {
+  .ff-mobile-toolbar,
+  .ff-drawer,
+  .ff-filter-trigger {
+    display: none !important;
+  }
+
+  .fresheek-filters .ff-header {
+    display: flex !important;
+  }
+
+  .fresheek-filters .ff-layout {
+    display: flex !important;
+  }
+
+  .fresheek-filters .ff-sidebar {
+    display: block !important;
+  }
+}
+
+/* ========== Infinite Scroll & Suppress Legacy Pagination ========== */
+.pagination-wrapper,
+nav.pagination,
+.pagination {
+  display: none !important;
+}
+
+.ff-infinite-scroll {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 36px 0 54px 0;
+  clear: both;
+}
+
+.ff-infinite-loader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ff-muted, #4b5563);
+}
+
+.ff-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid #e5e7eb;
+  border-top-color: var(--ff-accent, #032443);
+  border-radius: 50%;
+  animation: ff-spin 0.75s linear infinite;
+}
+
+@keyframes ff-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ff-infinite-end {
+  font-size: 13px;
+  color: var(--ff-muted, #6b7280);
+  padding: 10px 22px;
+  background: #f9fafb;
+  border-radius: 999px;
+  border: 1px dashed var(--ff-border, #e5e7eb);
+}

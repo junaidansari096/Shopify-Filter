@@ -1,0 +1,20 @@
+{
+  "filters": {
+    "title": "Filters",
+    "products": "products",
+    "clear_all": "Clear all",
+    "show_more": "+ Show more",
+    "show_less": "− Show less",
+    "search_options": "Search options...",
+    "no_match": "No matching options",
+    "no_filters": "No filters are available on this page.",
+    "apply": "Apply filters",
+    "view_items": "View {{ count }} items",
+    "price_minimum": "Minimum",
+    "price_maximum": "Maximum",
+    "close_filters": "Close filters",
+    "no_products": "No products match your filters.",
+    "try_removing": "Try removing one or more filters.",
+    "clear_all_filters": "Clear all filters"
+  }
+}

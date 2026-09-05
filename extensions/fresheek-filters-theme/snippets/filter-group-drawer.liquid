@@ -1,0 +1,29 @@
+{% comment %}
+  filter-group-drawer.liquid
+  Drawer variant of a filter group (mobile). Keeps the same input name/value
+  semantics so the URL construction works identically for mobile and desktop,
+  avoiding duplicated network state.
+{% endcomment %}
+
+{%- assign f = filter -%}
+<div class="ff-group" data-ff-group data-ff-param="{{ f.param_name | escape }}" data-ff-label="{{ f.label | escape }}">
+  <div class="ff-group-header">
+    <button type="button" class="ff-group-toggle" aria-expanded="false" aria-controls="ff-mobile-group-body-{{ f.param_name | handleize }}" data-ff-group-toggle>
+      <span class="ff-group-label">{{ f.label | escape }}</span>
+      <span class="ff-group-caret" aria-hidden="true">›</span>
+    </button>
+  </div>
+  <div class="ff-group-body" id="ff-mobile-group-body-{{ f.param_name | handleize }}" data-ff-group-body hidden>
+    {%- if f.type == 'price_range' -%}
+      {%- render 'price-filter', filter: f, scope: 'mobile' -%}
+    {%- elsif f.type == 'boolean' -%}
+      {%- render 'filter-option', filter: f, value: f.values.first, presentation: 'boolean', scope: 'mobile' -%}
+    {%- else -%}
+      <div class="ff-option-list" data-ff-option-list data-ff-preserve-search="true">
+        {%- for value in f.values -%}
+          {%- render 'filter-option', filter: f, value: value, presentation: 'checkbox-list', scope: 'mobile' -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>

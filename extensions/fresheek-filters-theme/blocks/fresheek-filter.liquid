@@ -1,0 +1,265 @@
+{% comment %}
+  Fresheek Filters — Theme App Block
+  Renders the storefront filter sidebar/drawer using Shopify's native
+  collection/search `filter` objects. The block is wired into the theme
+  via Theme Editor on a collection or search template.
+
+  Shopify provides `collection.filters` (and `search.filters`) which reflect
+  the active collection page's facets. We render our own presentation on top
+  of that native data — we never reconstruct the page or download the catalog.
+
+  Progressive enhancement: the whole UI is a <form method="get"> so that if
+  JS fails, submitting still performs a normal Shopify GET to the collection
+  URL with the chosen filter parameters.
+{% endcomment %}
+
+{%- assign ff_enable_desktop = block.settings.enable_desktop | default: true -%}
+{%- assign ff_enable_mobile = block.settings.enable_mobile | default: true -%}
+{%- assign ff_sidebar_width = block.settings.sidebar_width | default: '260px' -%}
+{%- assign ff_sticky = block.settings.sticky_filters | default: true -%}
+{%- assign ff_sticky_offset = block.settings.sticky_top_offset | default: '80px' -%}
+{%- assign ff_show_count = block.settings.show_product_count | default: true -%}
+{%- assign ff_show_active = block.settings.show_active_filters | default: true -%}
+{%- assign ff_breakpoint = block.settings.mobile_breakpoint | default: 990 -%}
+{%- assign ff_accent = block.settings.accent_color | default: '#032443' -%}
+{%- assign ff_hide_theme_filters = true -%}
+{%- if block.settings.hide_theme_filters == false -%}
+  {%- assign ff_hide_theme_filters = false -%}
+{%- endif -%}
+
+{%- comment -%}
+  Decide which filter set to use. Collections expose `collection.filters`.
+  Search pages expose `search.filters`.
+{%- endcomment -%}
+{%- if collection -%}
+  {%- assign ff_filters = collection.filters -%}
+  {%- assign ff_resource = collection -%}
+  {%- assign ff_base_url = collection.url -%}
+{%- elsif search -%}
+  {%- assign ff_filters = search.filters -%}
+  {%- assign ff_resource = search -%}
+  {%- assign ff_base_url = routes.search_url -%}
+{%- else -%}
+  {%- assign ff_filters = nil -%}
+  {%- assign ff_resource = nil -%}
+  {%- assign ff_base_url = '' -%}
+{%- endif -%}
+
+<div
+  class="fresheek-filters"
+  data-ff-enable-desktop="{{ ff_enable_desktop }}"
+  data-ff-enable-mobile="{{ ff_enable_mobile }}"
+  data-ff-sidebar-width="{{ ff_sidebar_width }}"
+  data-ff-sticky="{{ ff_sticky }}"
+  data-ff-sticky-offset="{{ ff_sticky_offset }}"
+  data-ff-show-count="{{ ff_show_count }}"
+  data-ff-show-active="{{ ff_show_active }}"
+  data-ff-breakpoint="{{ ff_breakpoint }}"
+  data-ff-accent="{{ ff_accent }}"
+  data-ff-base-url="{{ ff_base_url | escape }}"
+  data-ff-has-filters="{% if ff_filters and ff_filters.size > 0 %}true{% else %}false{% endif %}"
+  data-ff-section-id="{{ section.id }}"
+  data-ff-shop="{{ shop.permanent_domain | escape }}"
+>
+  {%- assign ff_bp_max = ff_breakpoint | minus: 1 -%}
+  <style>
+    .fresheek-filters {
+      --ff-accent: {{ ff_accent }};
+      --ff-sidebar-width: {{ ff_sidebar_width }};
+      --ff-sticky-offset: {{ ff_sticky_offset }};
+      --ff-mobile-breakpoint: {{ ff_breakpoint }}px;
+    }
+    {%- if ff_hide_theme_filters -%}
+      .facets-container,
+      facet-filters-form,
+      .facets__form,
+      .facets__form-vertical,
+      .collection-filters {
+        display: none !important;
+      }
+    {%- endif -%}
+
+    @media (max-width: {{ ff_bp_max }}px) {
+      .fresheek-filters .ff-header,
+      .fresheek-filters .ff-layout,
+      .fresheek-filters .ff-sidebar {
+        display: none !important;
+      }
+      .fresheek-filters .ff-mobile-toolbar {
+        display: flex !important;
+      }
+    }
+
+    @media (min-width: {{ ff_breakpoint }}px) {
+      .fresheek-filters .ff-mobile-toolbar,
+      .fresheek-filters .ff-drawer,
+      .fresheek-filters .ff-filter-trigger {
+        display: none !important;
+      }
+      .fresheek-filters .ff-header {
+        display: flex !important;
+      }
+      .fresheek-filters .ff-layout {
+        display: flex !important;
+      }
+      .fresheek-filters .ff-sidebar {
+        display: block !important;
+      }
+    }
+  </style>
+
+  {%- if ff_filters == nil or ff_filters.size == 0 -%}
+    {%- comment -%} No native filter data available; render fallback that does nothing.{%- endcomment -%}
+    <p class="ff-empty" data-ff-empty>{{ 'filters.no_filters' | t: default: 'No filters are available on this page.' }}</p>
+  {%- else -%}
+    {%- comment -%} Mobile toolbar (prominent filter trigger + product count) {%- endcomment -%}
+    <div class="ff-mobile-toolbar" data-ff-mobile-toolbar>
+      <button
+        type="button"
+        class="ff-filter-trigger"
+        data-ff-filter-trigger
+        aria-haspopup="dialog"
+        aria-controls="ff-drawer"
+        aria-label="{{ 'filters.title' | t: default: 'Filters' }}"
+      >
+        <svg class="ff-trigger-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="4" y1="21" x2="4" y2="14"></line>
+          <line x1="4" y1="10" x2="4" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12" y2="3"></line>
+          <line x1="20" y1="21" x2="20" y2="16"></line>
+          <line x1="20" y1="12" x2="20" y2="3"></line>
+          <line x1="1" y1="14" x2="7" y2="14"></line>
+          <line x1="9" y1="8" x2="15" y2="8"></line>
+          <line x1="17" y1="16" x2="23" y2="16"></line>
+        </svg>
+        <span>{{ 'filters.title' | t: default: 'Filters' }}</span>
+        <span class="ff-trigger-badge" data-ff-trigger-badge style="display: none;">0</span>
+      </button>
+
+      {%- if ff_show_count -%}
+        <span class="ff-mobile-product-count" data-ff-product-count>
+          {{ ff_resource.products_count }} <span class="ff-count-label">{{ 'filters.products' | t: default: 'products' }}</span>
+        </span>
+      {%- endif -%}
+    </div>
+
+    <form
+      method="get"
+      action="{{ ff_base_url }}"
+      class="ff-form"
+      data-ff-form
+    >
+      {%- comment -%} Preserve unrelated query params (sort_by, q, etc.) in hidden inputs. {%- endcomment -%}
+      {%- for param in request.query -%}
+        {%- assign key = param[0] -%}
+        {%- assign value = param[1] -%}
+        {%- assign is_filter = false -%}
+        {%- if key contains 'filter.' or key == 'page' -%}
+          {%- assign is_filter = true -%}
+        {%- endif -%}
+        {%- unless is_filter -%}
+          <input type="hidden" name="{{ key | escape }}" value="{{ value | escape }}">
+        {%- endunless -%}
+      {%- endfor -%}
+
+      {%- comment -%} Desktop sidebar {%- endcomment -%}
+      <div class="ff-layout">
+        <aside class="ff-sidebar" data-ff-sidebar aria-label="Product filters">
+          <div class="ff-header" data-ff-header>
+            <span class="ff-filters-label">{{ 'filters.title' | t: default: 'Filters' }}</span>
+            <button type="button" class="ff-clear-all" data-ff-clear-all aria-label="{{ 'filters.clear_all' | t: default: 'Clear all' }}">{{ 'filters.clear_all' | t: default: 'Clear all' }}</button>
+          </div>
+
+          {%- render 'active-filters', filters: ff_filters -%}
+
+          <div class="ff-group-list">
+            {%- for filter in ff_filters -%}
+              {%- render 'filter-group', filter: filter, close: forloop.last -%}
+            {%- endfor -%}
+          </div>
+        </aside>
+      </div>
+
+      {%- comment -%} Mobile drawer {%- endcomment -%}
+      {%- render 'filter-mobile-drawer', filters: ff_filters -%}
+
+      <noscript>
+        <button type="submit" class="ff-apply-fallback">{{ 'filters.apply' | t: default: 'Apply filters' }}</button>
+      </noscript>
+    </form>
+  {%- endif -%}
+</div>
+
+<script src="{{ 'fresheek-filters.js' | asset_url }}" defer></script>
+<link rel="stylesheet" href="{{ 'fresheek-filters.css' | asset_url }}">
+
+{% schema %}
+{
+  "name": "Fresheek Filters",
+  "target": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_desktop",
+      "label": "Enable desktop filters",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_mobile",
+      "label": "Enable mobile filters",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "sidebar_width",
+      "label": "Sidebar width",
+      "default": "260px"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_filters",
+      "label": "Sticky filters",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "sticky_top_offset",
+      "label": "Sticky top offset",
+      "default": "80px"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "Show product count",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_active_filters",
+      "label": "Show active filters",
+      "default": true
+    },
+    {
+      "type": "number",
+      "id": "mobile_breakpoint",
+      "label": "Mobile breakpoint (px)",
+      "default": 990
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#032443"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_theme_filters",
+      "label": "Hide theme's native filters",
+      "info": "Hides Horizon/Dawn theme default filter bar to prevent duplicate filters.",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

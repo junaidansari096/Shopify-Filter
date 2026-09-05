@@ -1,0 +1,79 @@
+{% comment %}
+  filter-group.liquid
+  Renders one filter group (e.g. Brand, Category, Price, Availability).
+
+  All option values are rendered in the DOM so "Show more / less" works
+  without additional server round-trips. JS (via CSS class) hides options
+  past the configured limit and toggles them on Show more.
+
+  Parameters:
+    - filter: the Shopify filter object
+{% endcomment %}
+
+{%- assign f = filter -%}
+<div class="ff-group" data-ff-group data-ff-param="{{ f.param_name | escape }}" data-ff-label="{{ f.label | escape }}">
+  <div class="ff-group-header">
+    <button
+      type="button"
+      class="ff-group-toggle"
+      aria-expanded="true"
+      aria-controls="ff-desktop-group-body-{{ f.param_name | handleize }}"
+      data-ff-group-toggle
+    >
+      <span class="ff-group-label">{{ f.label | escape }}</span>
+      <span class="ff-group-caret" aria-hidden="true">˅</span>
+    </button>
+  </div>
+
+  <div class="ff-group-body" id="ff-desktop-group-body-{{ f.param_name | handleize }}" data-ff-group-body>
+    {%- if f.type == 'price_range' -%}
+      {%- render 'price-filter', filter: f, scope: 'desktop' -%}
+    {%- elsif f.type == 'boolean' -%}
+      {%- render 'filter-option', filter: f, value: f.values.first, presentation: 'boolean', scope: 'desktop' -%}
+    {%- else -%}
+      {%- assign limit = initial_visible_count | default: 8 -%}
+      {%- assign total = f.values.size -%}
+      {%- assign allow_search = searchable -%}
+      {%- if allow_search == nil -%}
+        {%- if total > limit -%}
+          {%- assign allow_search = true -%}
+        {%- else -%}
+          {%- assign allow_search = false -%}
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- if allow_search -%}
+        <div class="ff-search" data-ff-search>
+          <input
+            type="text"
+            class="ff-search-input"
+            data-ff-search-input
+            placeholder="Search {{ f.label | downcase | escape }}"
+            aria-label="Search {{ f.label | escape }}"
+            autocomplete="off"
+          >
+        </div>
+      {%- endif -%}
+
+      <div class="ff-option-list" data-ff-option-list data-ff-limit="{{ limit }}">
+        {%- for value in f.values -%}
+          {%- assign overflow = false -%}
+          {%- if forloop.index > limit and value.active == false -%}
+            {%- assign overflow = true -%}
+          {%- endif -%}
+          <div class="ff-option-row{% if overflow %} ff-option-row--overflow{% endif %}" data-ff-option-row>
+            {%- render 'filter-option', filter: f, value: value, scope: 'desktop' -%}
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if total > limit -%}
+        <div class="ff-more-wrap" data-ff-more-wrap>
+          <button type="button" class="ff-show-more" data-ff-show-more hidden>{{ 'filters.show_more' | t: default: '+ Show more' }}</button>
+          <button type="button" class="ff-show-less" data-ff-show-less hidden>{{ 'filters.show_less' | t: default: '− Show less' }}</button>
+        </div>
+        <p class="ff-no-match" data-ff-no-match hidden>{{ 'filters.no_match' | t: default: 'No matching options' }}</p>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</div>

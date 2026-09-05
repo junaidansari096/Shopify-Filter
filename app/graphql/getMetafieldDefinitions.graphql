@@ -1,0 +1,18 @@
+# Get metafield definitions for the shop so the admin can surface
+# eligible product metafield filters.
+query GetMetafieldDefinitions($first: Int!) {
+  metafieldDefinitions(first: $first, ownerType: PRODUCT) {
+    edges {
+      node {
+        id
+        key
+        namespace
+        name
+        type {
+          name
+          category
+        }
+      }
+    }
+  }
+}

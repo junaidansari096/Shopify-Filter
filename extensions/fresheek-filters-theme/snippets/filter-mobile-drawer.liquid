@@ -1,0 +1,37 @@
+{% comment %}
+  filter-mobile-drawer.liquid
+  A full-screen mobile drawer containing all filter groups plus a
+  "View N items" apply bar. Uses native <dialog>-like semantics with
+  ARIA, focus trapping (handled in JS), Escape-to-close, body scroll lock.
+{% endcomment %}
+
+<div class="ff-drawer" data-ff-drawer role="dialog" aria-modal="true" aria-label="Filters" hidden>
+  <div class="ff-drawer-overlay" data-ff-drawer-overlay></div>
+  <div class="ff-drawer-panel" data-ff-drawer-panel>
+    <header class="ff-drawer-header">
+      <h2 class="ff-drawer-title">{{ 'filters.title' | t: default: 'Filters' }}</h2>
+      <button type="button" class="ff-drawer-close" data-ff-drawer-close aria-label="{{ 'filters.close_filters' | t: default: 'Close filters' }}">✕</button>
+    </header>
+
+    <div class="ff-drawer-body" data-ff-drawer-body>
+      {%- render 'active-filters', filters: filters -%}
+      {% comment %}
+        The drawer reuses the same filter group markup via a separate
+        render pass so mobile and desktop share the same native data but
+        are presented in the drawer.
+      {% endcomment %}
+      <div class="ff-group-list ff-group-list--drawer">
+        {%- for filter in filters -%}
+          {%- render 'filter-group-drawer', filter: filter, forloop: forloop -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <footer class="ff-drawer-footer">
+      <button type="button" class="ff-clear-all" data-ff-clear-all>{{ 'filters.clear_all' | t: default: 'Clear all' }}</button>
+      <button type="button" class="ff-drawer-view" data-ff-drawer-view>
+        View <span data-ff-drawer-count data-ff-product-count>{{ collection.products_count | default: search.results_count | default: 0 }}</span> {{ 'filters.products' | t: default: 'products' }}
+      </button>
+    </footer>
+  </div>
+</div>

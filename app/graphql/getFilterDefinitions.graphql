@@ -1,0 +1,53 @@
+# Detect available filter sources on the shop.
+# Returns product vendors, product types, and product variant options
+# so the admin can configure filters against real data sources.
+query GetFilterDefinitions($first: Int!, $productFirst: Int!) {
+  shop {
+    id
+    productTypes(first: 10) {
+      edges {
+        node
+      }
+    }
+  }
+  products(first: $productFirst) {
+    edges {
+      node {
+        id
+        vendor
+        productType
+        options {
+          name
+          values
+        }
+        metafields(first: 50) {
+          edges {
+            node {
+              key
+              namespace
+              value
+              type
+              definition {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  metafieldDefinitions(first: 50, ownerType: PRODUCT) {
+    edges {
+      node {
+        id
+        key
+        namespace
+        name
+        type {
+          name
+          category
+        }
+      }
+    }
+  }
+}

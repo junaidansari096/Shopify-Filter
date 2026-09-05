@@ -1,0 +1,13 @@
+# Fresheek Filters — Theme App Extension
+# Block settings and placement are defined in the block's {% schema %}
+# (blocks/fresheek-filter.liquid). Deeper filter configuration lives in the
+# Fresheek Filters Admin app. Theme app extensions auto-discover files in
+# blocks/, snippets/, assets/, and locales/ — no targeting/settings here.
+
+api_version = "2025-01"
+
+[[extensions]]
+type = "theme"
+name = "Fresheek Filters"
+handle = "fresheek-filters"
+uid = "c712f40f-d36c-cd89-eb7f-ed4a5432cb3c6e22f421"
