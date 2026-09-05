@@ -12,11 +12,15 @@ import { initKeepAlive } from "./services/keepalive.server";
 initKeepAlive();
 
 const shopify = shopifyApp({
-  apiKey: process.env.SHOPIFY_API_KEY,
-  apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
+  apiKey: process.env.SHOPIFY_API_KEY || "dummy_api_key",
+  apiSecretKey: process.env.SHOPIFY_API_SECRET || "dummy_secret_key",
   apiVersion: ApiVersion.October25,
   scopes: (process.env.SCOPES ?? "read_products,write_themes,read_shop_domains").split(","),
-  appUrl: process.env.SHOPIFY_APP_URL || "",
+  appUrl:
+    process.env.SHOPIFY_APP_URL ||
+    process.env.RENDER_EXTERNAL_URL ||
+    process.env.APP_URL ||
+    "https://shopify-filter.onrender.com",
   authPathPrefix: "/auth",
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
