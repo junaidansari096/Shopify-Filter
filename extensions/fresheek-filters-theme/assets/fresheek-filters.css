@@ -68,6 +68,44 @@
   min-width: 0 !important;
 }
 
+@media (min-width: 990px) {
+  .ff-app-section-docked {
+    display: none !important;
+  }
+
+  .ff-docked-parent {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 36px !important;
+    width: 100% !important;
+    max-width: var(--page-width, 1600px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    box-sizing: border-box !important;
+  }
+
+  .ff-docked-parent > .ff-layout,
+  .ff-docked-parent > aside.facets-wrapper,
+  .ff-docked-parent > #main-collection-filters {
+    width: var(--ff-sidebar-width, 260px) !important;
+    min-width: var(--ff-sidebar-width, 260px) !important;
+    max-width: var(--ff-sidebar-width, 260px) !important;
+    flex: 0 0 var(--ff-sidebar-width, 260px) !important;
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .ff-docked-parent > .product-grid-container,
+  .ff-docked-parent > #ProductGridContainer {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    width: auto !important;
+  }
+}
+
 /* ========== Header bar ========== */
 .ff-header {
   display: flex;

@@ -1,0 +1,42 @@
+{% comment %}
+  Fresheek Filters — Theme App Embed (target: body)
+  Enables 1-click activation from Theme settings -> App embeds tab.
+{% endcomment %}
+
+{%- if request.page_type == 'collection' or request.page_type == 'search' -%}
+  <script src="{{ 'fresheek-filters.js' | asset_url }}" defer></script>
+  <link rel="stylesheet" href="{{ 'fresheek-filters.css' | asset_url }}">
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Fresheek Filters (Embed)",
+  "target": "body",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_desktop",
+      "label": "Enable desktop filters",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_mobile",
+      "label": "Enable mobile filters",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "sidebar_width",
+      "label": "Sidebar width",
+      "default": "260px"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#032443"
+    }
+  ]
+}
+{% endschema %}

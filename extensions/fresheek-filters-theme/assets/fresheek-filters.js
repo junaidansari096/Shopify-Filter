@@ -1397,6 +1397,56 @@
 
     // Hydrate dynamic merchant settings if available from app backend.
     StorefrontConfigManager.hydrate();
+
+    // Dock desktop sidebar onto the left of the theme's product grid
+    dockDesktopSidebar();
+    window.addEventListener("resize", dockDesktopSidebar);
+    document.addEventListener("shopify:section:load", dockDesktopSidebar);
+  }
+
+  function dockDesktopSidebar() {
+    if (!config.enableDesktop) return;
+
+    var desktopLayout = root.querySelector(".ff-layout");
+    if (!desktopLayout) return;
+
+    var isDesktop = window.innerWidth >= config.breakpoint;
+
+    var gridContainer = document.querySelector(
+      "#ProductGridContainer, .product-grid-container"
+    );
+    if (!gridContainer) {
+      var gridUl = document.querySelector("#product-grid, ul.product-grid");
+      if (gridUl && gridUl.parentElement) {
+        gridContainer = gridUl.parentElement;
+      }
+    }
+    if (!gridContainer) return;
+
+    var gridParent = gridContainer.parentElement;
+    if (!gridParent) return;
+
+    if (isDesktop) {
+      var nativeAside = gridParent.querySelector("#main-collection-filters, aside.facets-wrapper");
+      if (nativeAside) {
+        if (!nativeAside.contains(desktopLayout)) {
+          nativeAside.innerHTML = "";
+          nativeAside.appendChild(desktopLayout);
+        }
+        nativeAside.style.display = "block";
+        nativeAside.style.visibility = "visible";
+      } else if (desktopLayout.parentElement !== gridParent) {
+        gridParent.insertBefore(desktopLayout, gridContainer);
+      }
+
+      gridParent.classList.add("ff-docked-parent");
+      desktopLayout.setAttribute("data-ff-docked", "true");
+
+      var appSection = root.closest(".shopify-section");
+      if (appSection && appSection !== gridParent.closest(".shopify-section")) {
+        appSection.classList.add("ff-app-section-docked");
+      }
+    }
   }
 
   function handlePriceApply(sectionId, optWidget) {
