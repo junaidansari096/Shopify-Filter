@@ -10,7 +10,7 @@
     "dev": "shopify app dev",
     "build": "prisma generate && (prisma db push --skip-generate --accept-data-loss || true) && react-router build",
     "build:extension": "shopify app build",
-    "start": "react-router-serve ./build/server/index.js",
+    "start": "(prisma db push --skip-generate --accept-data-loss || true) && react-router-serve ./build/server/index.js",
     "deploy": "shopify app deploy",
     "config:link": "shopify app config link",
     "prisma:generate": "prisma generate",
