@@ -1,5 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 
+// Ensure DATABASE_URL is never empty string, preventing crash on boot
+if (!process.env.DATABASE_URL || process.env.DATABASE_URL.trim() === "") {
+  process.env.DATABASE_URL = "file:./dev.sqlite";
+}
+
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
 };

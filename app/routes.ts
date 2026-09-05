@@ -3,8 +3,8 @@ import { type RouteConfig, route, index, layout } from "@react-router/dev/routes
 const routes: RouteConfig = [
   // Landing route: redirect into the embedded app shell.
   index("routes/_index.tsx"),
-  // Shopify OAuth + token-exchange flows under /auth*.
-  route("auth*", "routes/auth.$.tsx"),
+  // Shopify OAuth + token-exchange flows under /auth/*.
+  route("auth/*", "routes/auth.$.tsx"),
   // Health check & keepalive endpoint.
   route("health", "routes/health.ts"),
   // Webhooks.
